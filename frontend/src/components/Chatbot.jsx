@@ -38,15 +38,23 @@ export default function Chatbot({ isOpen, onClose }) {
     setMessages((prev) => [...prev, userMsg]);
     setLoading(true);
     setInput("");
+
+    // Detect environment and set Base URL
     const API_BASE =
       window.location.hostname === "localhost"
         ? "http://localhost:8000"
         : "https://stride-l0ln.onrender.com";
 
     try {
+      // Get token from localStorage for authorized requests
+      const token = localStorage.getItem("token");
+
       const response = await fetch(`${API_BASE}/api/chat`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
         body: JSON.stringify({
           model: "llama-3.1-8b-instant",
           max_tokens: 800,
@@ -57,7 +65,11 @@ export default function Chatbot({ isOpen, onClose }) {
               content:
                 "You are Stride AI, a resume assistant. Help with ATS optimization, resume writing, pricing ($9/$19/$49 plans), career advice. Be concise and professional. Format lists with • bullets. Use **bold** for emphasis.",
             },
-            ...messages,
+            // Map messages to remove HTML tags before sending to AI
+            ...messages.map((m) => ({
+              role: m.role,
+              content: m.content.replace(/<[^>]*>/g, ""),
+            })),
             userMsg,
           ],
         }),
@@ -70,6 +82,7 @@ export default function Chatbot({ isOpen, onClose }) {
       const reply =
         data.choices?.[0]?.message?.content?.trim() || "No response from AI.";
 
+      // Format response for the chat UI
       const formatted = reply
         .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
         .replace(/•/g, "• ")
@@ -86,7 +99,8 @@ export default function Chatbot({ isOpen, onClose }) {
         ...prev,
         {
           role: "assistant",
-          content: "Connection error. Please try again.",
+          content:
+            "Connection error. Please check your internet or ad-blocker and try again.",
         },
       ]);
     } finally {
@@ -104,8 +118,8 @@ export default function Chatbot({ isOpen, onClose }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-end p-4 md:p-6">
-      <div className="w-full max-w-sm h-[450px] bg-white dark:bg-slate-900 border rounded-xl shadow-xl flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-end justify-end p-4 md:p-6 pointer-events-none">
+      <div className="w-full max-w-sm h-[450px] bg-white dark:bg-slate-900 border rounded-xl shadow-xl flex flex-col pointer-events-auto">
         {/* Header */}
         <div className="p-4 border-b flex justify-between items-center">
           <div className="flex items-center gap-2">
@@ -162,14 +176,14 @@ export default function Chatbot({ isOpen, onClose }) {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Ask about resumes, pricing, ATS..."
+              placeholder="Ask about resumes..."
               className="flex-1 px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-xl text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
               disabled={loading}
             />
             <button
               onClick={sendMessage}
               disabled={!input.trim() || loading}
-              className="px-6 py-2 bg-indigo-500 text-white rounded-xl text-sm"
+              className="px-6 py-2 bg-indigo-500 text-white rounded-xl text-sm font-medium hover:bg-indigo-600 transition-colors disabled:opacity-50"
             >
               Send
             </button>

@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"; // Added Navigate
 import Navbar from "./components/Navbar.jsx";
 import Home from "./pages/Home.jsx";
 import Features from "./pages/Features.jsx";
@@ -13,6 +13,8 @@ function App() {
     <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100">
       <Navbar />
       <Routes>
+        <Route path="/index.html" element={<Navigate to="/" replace />} />
+
         <Route path="/" element={<Home />} />
         <Route path="/features" element={<Features />} />
         <Route path="/price" element={<Price />} />
@@ -20,6 +22,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/builder" element={<Resume />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </div>
   );
