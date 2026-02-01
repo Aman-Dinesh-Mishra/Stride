@@ -1,4 +1,4 @@
-# StrideAI : Build resumes that getpast hiring systems  
+# StrideAI : Build resumes that get past hiring systems  
 An AI-powered resume builder designed to help users create professional resumes quickly and export them in PDF format.
 
 ---
