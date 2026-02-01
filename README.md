@@ -27,6 +27,9 @@ StrideAI streamlines the resume creation process by combining user-friendly inpu
 1. Clone the repository:
    ```bash
    git clone https://github.com/your-username/StrideAI.git
-   cd StrideAI```
+   cd StrideAI
+   ```
+2. Navigate to frontend: ``` cd frontend ```
+3. Run the project using command: ``` npm run dev ```
 ## Live Demo:
  Visit: https://strideai.onrender.com/
