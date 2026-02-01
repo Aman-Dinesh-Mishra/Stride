@@ -1,23 +1,29 @@
 import axios from "axios";
 
-const BASE_URL = "http://localhost:8000/api/v1";
+const BASE_URL =
+  window.location.hostname === "localhost"
+    ? "http://localhost:8000/api/v1"
+    : "https://stride-l0ln.onrender.com/api/v1";
 
 export const loginUser = async (formData) => {
   const response = await axios.post(`${BASE_URL}/users/login`, formData);
   return response.data;
 };
 
-const authHeader = () => ({
-  headers: {
-    Authorization: `Bearer ${localStorage.getItem("token")}`,
-  },
-});
+const authHeader = () => {
+  const token = localStorage.getItem("token");
+  return {
+    headers: {
+      Authorization: token ? `Bearer ${token}` : "",
+    },
+  };
+};
 
 export const generateResume = async (payload) => {
   const response = await axios.post(
     `${BASE_URL}/resume/generate`,
     payload,
-    authHeader()
+    authHeader(),
   );
   return response.data;
 };
@@ -30,7 +36,7 @@ export const getAllResumes = async () => {
 export const getResumeById = async (resumeId) => {
   const response = await axios.get(
     `${BASE_URL}/resume/${resumeId}`,
-    authHeader()
+    authHeader(),
   );
   return response.data;
 };
@@ -39,7 +45,7 @@ export const updateResume = async (resumeId, updateData) => {
   const response = await axios.put(
     `${BASE_URL}/resume/${resumeId}`,
     updateData,
-    authHeader()
+    authHeader(),
   );
   return response.data;
 };
@@ -47,7 +53,7 @@ export const updateResume = async (resumeId, updateData) => {
 export const deleteResume = async (resumeId) => {
   const response = await axios.delete(
     `${BASE_URL}/resume/${resumeId}`,
-    authHeader()
+    authHeader(),
   );
   return response.data;
 };
