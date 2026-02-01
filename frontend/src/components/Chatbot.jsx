@@ -38,9 +38,13 @@ export default function Chatbot({ isOpen, onClose }) {
     setMessages((prev) => [...prev, userMsg]);
     setLoading(true);
     setInput("");
+    const API_BASE =
+      window.location.hostname === "localhost"
+        ? "http://localhost:8000"
+        : "https://stride-l0ln.onrender.com";
 
     try {
-      const response = await fetch("http://localhost:8000/api/chat", {
+      const response = await fetch(`${API_BASE}/api/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -64,8 +68,8 @@ export default function Chatbot({ isOpen, onClose }) {
         throw new Error(data.error?.message || "Unknown API error");
 
       const reply =
-        data.choices?.[0]?.message?.content?.trim() ||
-        "No response from AI.";
+        data.choices?.[0]?.message?.content?.trim() || "No response from AI.";
+
       const formatted = reply
         .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
         .replace(/•/g, "• ")
@@ -77,11 +81,12 @@ export default function Chatbot({ isOpen, onClose }) {
         { role: "assistant", content: formatted },
       ]);
     } catch (err) {
+      console.error("Chat error:", err);
       setMessages((prev) => [
         ...prev,
         {
           role: "assistant",
-          content: " Connection error. Please try again.",
+          content: "Connection error. Please try again.",
         },
       ]);
     } finally {
